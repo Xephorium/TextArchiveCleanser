@@ -1,0 +1,13 @@
+
+# IntelliJ Files
+.idea/
+*.iml
+
+# Input Files
+Source/input/
+
+# Build Files
+Source/build/
+
+# Output Files
+Source/output

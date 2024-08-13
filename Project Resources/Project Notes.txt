@@ -1,0 +1,65 @@
+
+/////////////////////////////
+/// Text Archive Cleanser ///
+///////////////////////////// 
+
+
+A tool that removes duplicate and spam messages from SMS Backup & Restore archives.
+
+
+/*--- Pseudocode ---*/
+
+	0. Advance in doc, copying all to output until line after the one that starts "<smses ".
+
+	1. Loop - While line starts "  <sms ", Read & Store SMS Data
+
+	     address (phone #)
+	       Add +1 to front
+	     date (timestamp)
+	       Remove last 3 digits (ms of second)
+	     body
+
+	     increment count
+
+	2. Loop - While line starts "  <mms ", Read MMS Data & check all sms for match, incrementing count
+
+	     address
+	       compare
+	     date
+	       Remove last 3 digits (ms of second)
+	       compare
+	     line contains the string "signal:TMessageId(id="
+	     body
+	       Proceed two lines in doc
+	       find "text" section (will exist even for mms with no body or only media: text="null")
+	       compare
+
+	     If (not match)
+	       write entire mms block to output
+	       increment count
+	     Else
+	       skip until "^  </mms>\n" and continue loop
+	       increment duplicate count
+	       print to separate duplicate doc?
+
+	3. Copy final line to output
+
+	4. Go back and modify output doc's count value (count="#")
+
+	5. Save doc
+
+
+/*--- XML Archive Format ---*/
+
+	  <sms protocol="0" address="3146810098" date="1487363440655" type="2" subject="null" body="Whoops, should have gone to ___" toa="null" sc_toa="null" service_center="null" read="1" status="-1" locked="0" date_sent="0" sub_id="-1" readable_date="Feb 17, 2017 2:30:40 PM" contact_name="Jonathan Cruzen" />
+
+	  ---------------------------------
+
+	  <mms date="1487363440000" rr="null" sub="null" ct_t="application/vnd.wap.multipart.related" read_status="null" seen="1" msg_box="2" address="+13146810098" sub_cs="null" resp_st="128" retr_st="null" d_tm="null" text_only="1" exp="null" locked="0" m_id="null" st="null" retr_txt_cs="null" retr_txt="null" creator="org.thoughtcrime.securesms" date_sent="1487363440" read="1" m_size="null" rpt_a="null" ct_cls="null" pri="129" sub_id="-1" tr_id="signal:TMessageId(id=45803)" resp_txt="null" ct_l="null" m_cls="personal" d_rpt="null" v="19" _id="17618" m_type="128" readable_date="Feb 17, 2017 2:30:40 PM" contact_name="Jonathan Cruzen">
+	    <parts>
+	      <part seq="0" ct="text/plain" name="null" chset="null" cd="null" fn="null" cid="&lt;signal:text&gt;" cl="null" ctt_s="null" ctt_t="null" text="Whoops, should have gone to ___" />
+	    </parts>
+	    <addrs>
+	      <addr address="+13146810098" type="151" charset="106" />
+	    </addrs>
+	  </mms>
