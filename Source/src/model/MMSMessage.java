@@ -110,19 +110,16 @@ public class MMSMessage {
         /* Read Content */
 
         // Read Content
-        boolean isContentFound = false;
         String content = "";
         List<String> entryLines = new ArrayList<>(Arrays.asList(entry.split("\n")));
         for (String line: entryLines) {
             if (line.contains(CONTENT_TYPE)) {
                 if (line.contains(CONTENT_END_DOUBLE_QUOTE)) {
-                    isContentFound = true;
                     content = line.substring(
                             line.indexOf(CONTENT_START_DOUBLE_QUOTE) + CONTENT_START_DOUBLE_QUOTE.length(),
                             line.indexOf(CONTENT_END_DOUBLE_QUOTE)
                     );
                 } else {
-                    isContentFound = true;
                     content = line.substring(
                             line.indexOf(CONTENT_START_SINGLE_QUOTE) + CONTENT_START_SINGLE_QUOTE.length(),
                             line.indexOf(CONTENT_END_SINGLE_QUOTE)
@@ -130,10 +127,6 @@ public class MMSMessage {
                 }
                 break;
             }
-        }
-
-        if (isContentFound) {
-            System.out.println(content);
         }
 
         return new MMSMessage(phoneNumberList, timestamp, content);
