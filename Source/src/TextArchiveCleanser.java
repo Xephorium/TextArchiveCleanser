@@ -26,6 +26,7 @@ public class TextArchiveCleanser {
     // Message Processing
     List<SMSMessage> smsMessageList;
     List<MMSMessage> mmsMessageList;
+    int duplicateMMSMessages = 0;
 
 
     /*--- Constructor ---*/
@@ -49,7 +50,9 @@ public class TextArchiveCleanser {
         parseMMSEntries();
         parseFooter();
 
-//        System.out.println("Total SMS Messages: " + smsMessageList.size());
+        System.out.println("SMS Total: " + smsMessageList.size());
+        System.out.println("MMS Uniqe: " + mmsMessageList.size());
+        System.out.println("MMS Dupli: " + duplicateMMSMessages);
     }
 
 
@@ -151,7 +154,12 @@ public class TextArchiveCleanser {
                 }
 
                 // Whole MMS Entry Read - Process
-                mmsMessageList.add(MMSMessage.fromEntry(mmsEntryStringBuilder.toString()));
+                MMSMessage mmsMessage = MMSMessage.fromEntry(mmsEntryStringBuilder.toString());
+                if (smsMessageList.contains(mmsMessage)) {
+                    duplicateMMSMessages++;
+                } else {
+                    mmsMessageList.add(mmsMessage);
+                }
             }
 
             // Check Next Line

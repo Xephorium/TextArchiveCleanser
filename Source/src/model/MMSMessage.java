@@ -4,6 +4,7 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class MMSMessage {
 
@@ -37,6 +38,39 @@ public class MMSMessage {
 
 
     /*--- Public Methods ---*/
+
+    public int getPhoneNumberListSize() {
+        return phoneNumberList.size();
+    }
+
+    public boolean doesPhoneNumberListContain(String phoneNumber) {
+        return phoneNumberList.contains(phoneNumber);
+    }
+
+    public String getTimestampWithoutMilliseconds() {
+        return timestamp.substring(0, timestamp.length() - 3);
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+
+        if (o == null) return false;
+
+        if(SMSMessage.class != o.getClass()) return false;
+
+        SMSMessage smsMessage = (SMSMessage) o;
+
+        return getPhoneNumberListSize() == 1 &&
+                doesPhoneNumberListContain(smsMessage.getPhoneNumber()) &&
+                getTimestampWithoutMilliseconds().equals(smsMessage.getTimestampWithoutMilliseconds()) &&
+                content.equals(smsMessage.getContent());
+    }
 
     public static MMSMessage fromEntry(String entry) {
 

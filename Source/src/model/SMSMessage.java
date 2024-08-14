@@ -1,6 +1,9 @@
 package model;
 
 
+import java.util.ArrayList;
+import java.util.Objects;
+
 public class SMSMessage {
 
 
@@ -30,6 +33,35 @@ public class SMSMessage {
 
 
     /*--- Public Methods ---*/
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getTimestampWithoutMilliseconds() {
+        return timestamp.substring(0, timestamp.length() - 3);
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+
+        if (o == null) return false;
+
+        if (o.getClass() != MMSMessage.class) return false;
+
+        MMSMessage mmsMessage = (MMSMessage) o;
+
+        return mmsMessage.getPhoneNumberListSize() == 1 &&
+                mmsMessage.doesPhoneNumberListContain(phoneNumber) &&
+                mmsMessage.getTimestampWithoutMilliseconds().equals(getTimestampWithoutMilliseconds()) &&
+                mmsMessage.getContent().equals(content);
+    }
 
     public static SMSMessage fromEntry(String entry) {
 
