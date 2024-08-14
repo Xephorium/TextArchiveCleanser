@@ -62,6 +62,15 @@ public class TextArchiveCleanser {
         smsMessageList.add(SMSMessage.fromEntry(entry));
     }
 
+    private void processMMSEntry(String entry) {
+        MMSMessage mmsMessage = MMSMessage.fromEntry(entry);
+        if (smsMessageList.contains(mmsMessage)) {
+            duplicateMMSMessages++;
+        } else {
+            mmsMessageList.add(mmsMessage);
+        }
+    }
+
 
     /*--- Private Parsing Methods ---*/
 
@@ -154,12 +163,7 @@ public class TextArchiveCleanser {
                 }
 
                 // Whole MMS Entry Read - Process
-                MMSMessage mmsMessage = MMSMessage.fromEntry(mmsEntryStringBuilder.toString());
-                if (smsMessageList.contains(mmsMessage)) {
-                    duplicateMMSMessages++;
-                } else {
-                    mmsMessageList.add(mmsMessage);
-                }
+                processMMSEntry(mmsEntryStringBuilder.toString());
             }
 
             // Check Next Line
