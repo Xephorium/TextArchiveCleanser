@@ -63,3 +63,19 @@ A tool that removes duplicate and spam messages from SMS Backup & Restore archiv
 	      <addr address="+13146810098" type="151" charset="106" />
 	    </addrs>
 	  </mms>
+
+
+/*--- Weird MMS Numbers ---*/
+
++8622759730 | Spam
+121611611   | Invalid number I accidentally texted a lot?
+74611888    | AT&T verification codes
+93639452    | AT&T payment reminders
+1113000     | AT&T updates
+11112018    | AT&T updates
+11112013    | AT&T updates
+48773       | FedEx delivery updates
+38773       | FedEx delivery updates
+46782       | Schnucks delivers updates
+...
+######      | 4-6 chars that are all digits = automated messages of some kind

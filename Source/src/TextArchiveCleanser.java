@@ -1,3 +1,4 @@
+import model.MMSMessage;
 import model.SMSMessage;
 
 import java.io.BufferedReader;
@@ -10,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.System.exit;
+import static java.lang.System.in;
 
 
 public class TextArchiveCleanser {
@@ -23,6 +25,7 @@ public class TextArchiveCleanser {
 
     // Message Processing
     List<SMSMessage> smsMessageList;
+    List<MMSMessage> mmsMessageList;
 
 
     /*--- Constructor ---*/
@@ -31,6 +34,7 @@ public class TextArchiveCleanser {
 
         // Initialize Variables
         smsMessageList = new ArrayList<>();
+        mmsMessageList = new ArrayList<>();
 
         // Open Files
         openInputFile();
@@ -45,7 +49,7 @@ public class TextArchiveCleanser {
         parseMMSEntries();
         parseFooter();
 
-        System.out.println("Total SMS Messages: " + smsMessageList.size());
+//        System.out.println("Total SMS Messages: " + smsMessageList.size());
     }
 
 
@@ -97,7 +101,7 @@ public class TextArchiveCleanser {
             mmsEntryMatcher = mmsEntryPattern.matcher(inputLine);
             if (!mmsEntryMatcher.find()) {
 
-                // SMS Entry - Parse
+                // SMS Entry - Process
                 processSMSEntry(inputLine);
 
             } else {
@@ -107,7 +111,7 @@ public class TextArchiveCleanser {
             }
 
             // Read Next Line
-            if ((inputLine = getNextLineOfInputFile()) == null) {
+            if (!isSMSParsingComplete && (inputLine = getNextLineOfInputFile()) == null) {
                 System.out.println("End of file reached while parsing sms entries.");
                 exit(0);
             }
@@ -115,29 +119,47 @@ public class TextArchiveCleanser {
     }
 
     private void parseMMSEntries() {
-        boolean isMMSParsingComplete = false;
-        Pattern eofPattern = Pattern.compile("^</smses>");
-        Matcher eofMatcher;
+        boolean isEndOfFileReached = false;
+        Pattern endOfFilePattern = Pattern.compile("^</smses>");
+        Pattern endOfMMSPattern = Pattern.compile("^  </mms>");
+        Matcher matcher;
 
-        while (!isMMSParsingComplete) {
+        while (!isEndOfFileReached) {
+            matcher = endOfFilePattern.matcher(inputLine);
+            if (matcher.find()) {
 
-            // Parse Line
-            eofMatcher = eofPattern.matcher(inputLine);
-            if (!eofMatcher.find()) {
-
-                // MMS Entry - Parse
-                // TODO - Parse MMS Entry
+                // End of File Reached - Exit Loop
+                isEndOfFileReached = true;
 
             } else {
 
-                // End of File Reached - Continue
-                isMMSParsingComplete = true;
+                // MMS Entry - Add First Line To String
+                StringBuilder mmsEntryStringBuilder = new StringBuilder();
+                mmsEntryStringBuilder.append(inputLine);
+                mmsEntryStringBuilder.append("\n");
+
+                // MMS Entry - Add Subsequent Lines To String
+                boolean isEndOfMMSReached = false;
+                while (!isEndOfMMSReached && (inputLine = getNextLineOfInputFile()) != null) {
+                    mmsEntryStringBuilder.append(inputLine);
+                    mmsEntryStringBuilder.append("\n");
+
+                    matcher = endOfMMSPattern.matcher(inputLine);
+                    if (matcher.find()) {
+                        isEndOfMMSReached = true;
+                    }
+                }
+
+                // Whole MMS Entry Read - Process
+                mmsMessageList.add(MMSMessage.fromEntry(mmsEntryStringBuilder.toString()));
             }
 
-            // Read Next Line
-            if (!isMMSParsingComplete && (inputLine = getNextLineOfInputFile()) == null) {
-                System.out.println("End of file reached while parsing mms entries.");
-                exit(0);
+            // Check Next Line
+            if (!isEndOfFileReached) {
+                if ((inputLine = getNextLineOfInputFile()) == null) {
+                    System.out.println("End of file reached while parsing mms entries.");
+                    exit(0);
+                }
             }
         }
     }

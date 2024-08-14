@@ -31,13 +31,10 @@ public class SMSMessage {
 
     /*--- Public Methods ---*/
 
-    public boolean equals(SMSMessage other) {
-        return this.phoneNumber.equals(other.phoneNumber) &&
-                this.timestamp.equals(other.timestamp) &&
-                this.content.equals(other.content);
-    }
-
     public static SMSMessage fromEntry(String entry) {
+
+
+        /* Read Phone Number */
 
         // Read Phone Number
         String phoneNumber = entry.substring(
@@ -62,9 +59,10 @@ public class SMSMessage {
          */
         if (false && phoneNumber.length() != 10) System.out.println(phoneNumber);
 
-        /* Read Timestamp
-         *
-         * Notes: All sms timestamps are confirmed to be 13 characters in length. However,
+
+        /* Read Timestamp */
+
+        /* Notes: All sms timestamps are confirmed to be 13 characters in length. However,
          *        the last three digits (representing millisecond) are zeroed out until
          *        timestamp 1409455938, or Saturday August 30 2014 10:32:18:938pm. Maybe
          *        this is the first text I received on a new smartphone?
@@ -73,6 +71,9 @@ public class SMSMessage {
                 entry.indexOf(TIMESTAMP_START) + TIMESTAMP_START.length(),
                 entry.indexOf(TIMESTAMP_END)
         );
+
+
+        /* Read Content */
 
         // Read Content
         String content;
