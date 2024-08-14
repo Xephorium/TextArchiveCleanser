@@ -1,5 +1,6 @@
 package model;
 
+
 public class SMSMessage {
 
 
@@ -51,7 +52,14 @@ public class SMSMessage {
             phoneNumber = phoneNumber.substring(1);
         }
 
-        // Print Weird Phone Numbers
+        /* Print Weird Phone Numbers
+         *
+         * Note: Pretty much every entry with a number that isn't 10 characters long can
+         *       be safely deleted. These are order confirmations, instacart messages,
+         *       two-factor authentication codes, billing reminders, and the like. I'll
+         *       want to do a final manual check of all records. But, it's most likely
+         *       that all of them can be cleared.
+         */
         if (false && phoneNumber.length() != 10) System.out.println(phoneNumber);
 
         /* Read Timestamp
