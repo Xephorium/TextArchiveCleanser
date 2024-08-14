@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 
 public class TextArchiveCleanser {
