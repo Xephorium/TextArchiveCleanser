@@ -118,6 +118,75 @@ public class SMSMessage {
             );
         }
 
+        /* Return Valid Entry */
+
         return new SMSMessage(phoneNumber, timestamp, content);
+    }
+
+    public boolean shouldBeFiltered() {
+
+
+        /* Filter Spam */
+
+        /* Four-Digit Numbers (Automated Messages)
+         *   AT&T Automated Messages
+         *   Mint Automated Messages
+         */
+        if (phoneNumber.length() == 4) {
+            return true;
+        }
+
+        /* Five-Digit Numbers (Automated Messages)
+         *   Basically everything else. I've scrolled through hundreds of entries and
+         *   the only thing I considered saving was appointment details for doctor visits.
+         *   Otherwise, just years of instacart orders, concert venue offers, Spectrum alerts,
+         *   verification codes, takeout orders, Nelnet reminders, retail spam, etc.
+         */
+        if (phoneNumber.length() == 5) {
+            return true;
+        }
+
+        /* Six-Digit Numbers (Automated Messages)
+         *   AMC
+         *   Microsoft
+         *   Steam
+         *   Stripe
+         *   Google
+         */
+        if (phoneNumber.length() == 6) {
+            return true;
+        }
+
+        /* Eight-Digit Numbers (Automated Messages)
+         *   More AT&T
+         *   More Google
+         */
+        if (phoneNumber.length() == 8) {
+            return true;
+        }
+
+        /* Alerts
+         *   AMBER
+         *   National Weather Service
+         */
+        if (phoneNumber.equals("#CMAS#CMASALL")) {
+            return true;
+        }
+
+        /* Specific Messages
+         */
+        if (
+                timestamp.equals("1360089340000") || // Shazam Text
+                phoneNumber.equals("129")            // Voicemail Pin Reset
+        ) {
+            return true;
+        }
+
+        // Print Weird Messages
+        if (false && phoneNumber.length() != 10) {
+            System.out.println(phoneNumber + " | " + content);
+        }
+
+        return false;
     }
 }

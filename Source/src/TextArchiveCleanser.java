@@ -23,8 +23,9 @@ public class TextArchiveCleanser {
     private String inputLine;
 
     // Message Processing
-    List<SMSMessage> smsMessageList;
-    List<MMSMessage> mmsMessageList;
+    List<SMSMessage> preservedSMSMessages;
+    List<SMSMessage> filteredSMSMessages;
+    List<MMSMessage> preservedMMSMessages;
     int duplicateMMSMessages = 0;
 
 
@@ -33,8 +34,9 @@ public class TextArchiveCleanser {
     public TextArchiveCleanser() {
 
         // Initialize Variables
-        smsMessageList = new ArrayList<>();
-        mmsMessageList = new ArrayList<>();
+        preservedSMSMessages = new ArrayList<>();
+        filteredSMSMessages = new ArrayList<>();
+        preservedMMSMessages = new ArrayList<>();
 
         // Open Files
         openInputFile();
@@ -49,25 +51,30 @@ public class TextArchiveCleanser {
         parseMMSEntries();
         parseFooter();
 
-        System.out.println("SMS Total: " + smsMessageList.size());
-        System.out.println("MMS Uniqe: " + mmsMessageList.size());
-        System.out.println("MMS Dupli: " + duplicateMMSMessages);
+        System.out.println("SMS Preserved:\t" + preservedSMSMessages.size());
+        System.out.println("MMS Preserved:\t" + preservedMMSMessages.size());
+        System.out.println("MMS Duplicates:\t" + duplicateMMSMessages);
     }
 
 
     /*--- Private Entry Processing Methods ---*/
 
     private void processSMSEntry(String entry) {
-        smsMessageList.add(SMSMessage.fromEntry(entry));
+        SMSMessage smsMessage = SMSMessage.fromEntry(entry);
+        if (smsMessage.shouldBeFiltered()) {
+            filteredSMSMessages.add(smsMessage);
+        } else {
+            preservedSMSMessages.add(smsMessage);
+        }
     }
 
     private void processMMSEntry(String entry) {
         MMSMessage mmsMessage = MMSMessage.fromEntry(entry);
-        if (smsMessageList.contains(mmsMessage)) {
-            duplicateMMSMessages++;
-        } else {
-            mmsMessageList.add(mmsMessage);
-        }
+//        if (smsMessageList.contains(mmsMessage)) {
+//            duplicateMMSMessages++;
+//        } else {
+            preservedMMSMessages.add(mmsMessage);
+//        }
     }
 
 
