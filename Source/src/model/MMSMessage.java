@@ -47,6 +47,10 @@ public class MMSMessage {
         return phoneNumberList.contains(phoneNumber);
     }
 
+    public double getTimestampAsDouble() {
+        return Double.parseDouble(timestamp);
+    }
+
     public String getTimestampWithoutMilliseconds() {
         return timestamp.substring(0, timestamp.length() - 3);
     }

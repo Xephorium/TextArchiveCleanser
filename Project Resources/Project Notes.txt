@@ -79,3 +79,25 @@ A tool that removes duplicate and spam messages from SMS Backup & Restore archiv
 46782       | Schnucks delivers updates
 ...
 ######      | 4-6 chars that are all digits = automated messages of some kind
+
+
+/*--- Findings ---*/
+
+SMS Total:          40978
+MMS Uniqe:          38919
+MMS Dupli:          31974
+MMS Unqe Aftr Sgnl: 38861
+Last Dupl:          1488992736000
+
+Last Duplicate Message:
+
+  Wednesday, March 8, 2017 5:05:36 PM
+
+  <mms date="1488992736000" rr="null" sub="null" ct_t="application/vnd.wap.multipart.related" read_status="null" seen="1" msg_box="1" address="+13144845513" sub_cs="null" resp_st="128" retr_st="null" d_tm="null" text_only="1" exp="null" locked="0" m_id="null" st="null" retr_txt_cs="null" retr_txt="null" creator="org.thoughtcrime.securesms" date_sent="1488992736" read="1" m_size="null" rpt_a="null" ct_cls="null" pri="129" sub_id="-1" tr_id="signal:TMessageId(id=48784)" resp_txt="null" ct_l="null" m_cls="personal" d_rpt="null" v="19" _id="20599" m_type="128" readable_date="Mar 8, 2017 11:05:36 AM" contact_name="Stephen Rubio">
+    <parts>
+      <part seq="0" ct="text/plain" name="null" chset="null" cd="null" fn="null" cid="&lt;signal:text&gt;" cl="null" ctt_s="null" ctt_t="null" text="I'm inviting you to install Signal! Here is the link: https://signal.org/install/" />
+    </parts>
+    <addrs>
+      <addr address="+13144845513" type="137" charset="106" />
+    </addrs>
+  </mms>
