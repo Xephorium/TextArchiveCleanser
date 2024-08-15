@@ -69,14 +69,16 @@ A tool that removes duplicate and spam messages from SMS Backup & Restore archiv
 
   Totals
     -----
+    Original Size:  111871 Messages
+    -----
     SMS Preserved:	39970
     SMS Filtered:	1008
     -----
-    MMS Duplicates:	31974
+    MMS Duplicates:	31974 (28.6% of Original Archive)
     MMS Preserved:	37148
     MMS Filtered:	1771
     -----
-    New Archive:	77118 Messages
+    New Archive:	77118 Messages (69% of Original Archive - Nice)
     -----
 
   Last Duplicate Message:

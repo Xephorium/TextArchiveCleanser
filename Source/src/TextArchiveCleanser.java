@@ -1,10 +1,7 @@
 import model.MMSMessage;
 import model.SMSMessage;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -12,6 +9,19 @@ import java.util.regex.Pattern;
 
 import static java.lang.System.exit;
 
+
+/* TextArchiveCleanser
+ * 08.14.2024
+ *
+ * TextArchiveCleanser is a tool that removes duplicate and spam messages from a
+ * SMS Backup & Restore archive in xml format.
+ *
+ * NOTE: This program will generate a file called 'archive.xml' in the 'output'
+ *       directory with a cleansed messaging database. However, the final step is
+ *       to manually open the file, go to line 8, and set the 'count' attribute
+ *       to the number listed on the command line as 'New Archive' upon program
+ *       completion.
+ */
 
 public class TextArchiveCleanser {
 
@@ -21,6 +31,9 @@ public class TextArchiveCleanser {
     // Input Processing
     private BufferedReader inputFileBufferedReader;
     private String inputLine;
+
+    // Output Processing
+    private BufferedWriter outputBufferedWriter;
 
     // Message Processing
     List<SMSMessage> preservedSMSMessages;
@@ -41,6 +54,7 @@ public class TextArchiveCleanser {
 
         // Open Files
         openInputFile();
+        openOutputFile();
     }
 
 
@@ -51,6 +65,8 @@ public class TextArchiveCleanser {
         parseSMSEntries();
         parseMMSEntries();
         parseFooter();
+
+        closeOutputFile();
 
         System.out.println("-----");
         System.out.println("SMS Preserved:\t" + preservedSMSMessages.size());
@@ -72,6 +88,7 @@ public class TextArchiveCleanser {
             filteredSMSMessages.add(smsMessage);
         } else {
             preservedSMSMessages.add(smsMessage);
+            writeToOutputFile(entry);
         }
     }
 
@@ -84,6 +101,7 @@ public class TextArchiveCleanser {
                 filteredMMSMessages++;
             } else {
                 preservedMMSMessages.add(mmsMessage);
+                writeToOutputFile(entry);
             }
         }
     }
@@ -109,7 +127,7 @@ public class TextArchiveCleanser {
             if (!smsEntryMatcher.find()) {
 
                 // Header Line - Add to Output
-                // TODO - Add to Output File
+                writeToOutputFile(inputLine);
 
             } else {
 
@@ -171,11 +189,12 @@ public class TextArchiveCleanser {
                 boolean isEndOfMMSReached = false;
                 while (!isEndOfMMSReached && (inputLine = getNextLineOfInputFile()) != null) {
                     mmsEntryStringBuilder.append(inputLine);
-                    mmsEntryStringBuilder.append("\n");
 
                     matcher = endOfMMSPattern.matcher(inputLine);
                     if (matcher.find()) {
                         isEndOfMMSReached = true;
+                    } else {
+                        mmsEntryStringBuilder.append("\n");
                     }
                 }
 
@@ -196,7 +215,7 @@ public class TextArchiveCleanser {
     private void parseFooter() {
 
         // Copy Footer to Output
-        // TODO - Add to Output File
+        writeToOutputFile(inputLine);
     }
 
 
@@ -228,6 +247,36 @@ public class TextArchiveCleanser {
             return inputFileBufferedReader.readLine();
         } catch (IOException e) {
             return null;
+        }
+    }
+
+    private void openOutputFile() {
+
+        // Build Output BufferedReader
+        try {
+            FileWriter outputFileWriter = new FileWriter("output/archive.xml", false);
+            outputBufferedWriter = new BufferedWriter(outputFileWriter);
+        } catch (IOException e) {
+            System.out.println("Error building FileWriter for output file.");
+            exit(0);
+        }
+    }
+
+    private void writeToOutputFile(String string) {
+        try {
+            outputBufferedWriter.append(string + "\n");
+        } catch (IOException e) {
+            System.out.println("Error writing string to output file.");
+            exit(0);
+        }
+    }
+
+    private void closeOutputFile() {
+        try {
+            outputBufferedWriter.close();
+        } catch (IOException e) {
+            System.out.println("Error closing output file.");
+            exit(0);
         }
     }
 }
