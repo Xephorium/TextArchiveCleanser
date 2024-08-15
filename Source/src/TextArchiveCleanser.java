@@ -26,6 +26,7 @@ public class TextArchiveCleanser {
     List<SMSMessage> preservedSMSMessages;
     List<SMSMessage> filteredSMSMessages;
     List<MMSMessage> preservedMMSMessages;
+    int filteredMMSMessages = 0;
     int duplicateMMSMessages = 0;
 
 
@@ -51,9 +52,15 @@ public class TextArchiveCleanser {
         parseMMSEntries();
         parseFooter();
 
+        System.out.println("-----");
         System.out.println("SMS Preserved:\t" + preservedSMSMessages.size());
-        System.out.println("MMS Preserved:\t" + preservedMMSMessages.size());
+        System.out.println("SMS Filtered:\t" + filteredSMSMessages.size());
+        System.out.println("-----");
         System.out.println("MMS Duplicates:\t" + duplicateMMSMessages);
+        System.out.println("MMS Preserved:\t" + preservedMMSMessages.size());
+        System.out.println("MMS Filtered:\t" + filteredMMSMessages);
+        System.out.println("-----");
+        System.out.println("New Archive:\t" + (preservedSMSMessages.size() + preservedMMSMessages.size()) + " Messages");
     }
 
 
@@ -70,11 +77,15 @@ public class TextArchiveCleanser {
 
     private void processMMSEntry(String entry) {
         MMSMessage mmsMessage = MMSMessage.fromEntry(entry);
-//        if (smsMessageList.contains(mmsMessage)) {
-//            duplicateMMSMessages++;
-//        } else {
-            preservedMMSMessages.add(mmsMessage);
-//        }
+        if (preservedSMSMessages.contains(mmsMessage) || filteredSMSMessages.contains(mmsMessage)) {
+            duplicateMMSMessages++;
+        } else {
+            if (mmsMessage.shouldBeFiltered()) {
+                filteredMMSMessages++;
+            } else {
+                preservedMMSMessages.add(mmsMessage);
+            }
+        }
     }
 
 

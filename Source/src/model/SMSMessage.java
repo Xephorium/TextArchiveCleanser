@@ -132,9 +132,7 @@ public class SMSMessage {
          *   AT&T Automated Messages
          *   Mint Automated Messages
          */
-        if (phoneNumber.length() == 4) {
-            return true;
-        }
+        if (phoneNumber.length() == 4) return true;
 
         /* Five-Digit Numbers (Automated Messages)
          *   Basically everything else. I've scrolled through hundreds of entries and
@@ -142,9 +140,7 @@ public class SMSMessage {
          *   Otherwise, just years of instacart orders, concert venue offers, Spectrum alerts,
          *   verification codes, takeout orders, Nelnet reminders, retail spam, etc.
          */
-        if (phoneNumber.length() == 5) {
-            return true;
-        }
+        if (phoneNumber.length() == 5) return true;
 
         /* Six-Digit Numbers (Automated Messages)
          *   AMC
@@ -153,25 +149,19 @@ public class SMSMessage {
          *   Stripe
          *   Google
          */
-        if (phoneNumber.length() == 6) {
-            return true;
-        }
+        if (phoneNumber.length() == 6) return true;
 
         /* Eight-Digit Numbers (Automated Messages)
          *   More AT&T
          *   More Google
          */
-        if (phoneNumber.length() == 8) {
-            return true;
-        }
+        if (phoneNumber.length() == 8) return true;
 
         /* Alerts
          *   AMBER
          *   National Weather Service
          */
-        if (phoneNumber.equals("#CMAS#CMASALL")) {
-            return true;
-        }
+        if (phoneNumber.equals("#CMAS#CMASALL")) return true;
 
         /* Specific Messages
          */
@@ -180,11 +170,6 @@ public class SMSMessage {
                 phoneNumber.equals("129")            // Voicemail Pin Reset
         ) {
             return true;
-        }
-
-        // Print Weird Messages
-        if (false && phoneNumber.length() != 10) {
-            System.out.println(phoneNumber + " | " + content);
         }
 
         return false;

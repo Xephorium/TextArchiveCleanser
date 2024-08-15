@@ -125,7 +125,9 @@ public class MMSMessage {
                 }
 
                 // Add Number
-                phoneNumberList.add(newNumber);
+                if (!shouldPhoneNumberBeSkipped(newNumber)) {
+                    phoneNumberList.add(newNumber);
+                }
 
                 // Iterate Index
                 index = entry.indexOf(PHONE_NUMBER_START, index + 1);
@@ -167,5 +169,102 @@ public class MMSMessage {
         }
 
         return new MMSMessage(phoneNumberList, timestamp, content);
+    }
+
+    public boolean shouldBeFiltered() {
+
+
+        /* Filter Spam */
+
+        for (String number: phoneNumberList) {
+
+            /* Four-Digit Numbers (Automated Messages - All Single Phone Number)
+             *   AT&T
+             *   Mint
+             */
+            if (number.length() == 4) return true;
+
+            /* Five-Digit Numbers (Automated Messages)
+             *   Pasta House
+             *   Bank of America
+             *   DHL
+             *   Webster Dental Care
+             *   Walgreens
+             *   FSA
+             *   UPS
+             *   DocASAP
+             *   UMSL (Preserved because funny - 67283, 77295)
+             *   USPS
+             *   Wayfair (Preserved because I like that chair - 65399)
+             *   Google
+             *   Walmart
+             *   Instacart
+             *   Mint
+             *   Zelle
+             *   AirBnB
+             *   Political Spam
+             *   Expedia
+             *   American Airlines
+             *   Imos Pizza
+             *
+             */
+            if (number.length() == 5 &&
+                    !number.equals("67283") &&
+                    !number.equals("77295") &&
+                    !number.equals("65399")
+            ) return true;
+
+            /* Six-Digit Numbers (Automated Messages)
+             *   Steam
+             *   Choice Hotels
+             *   UMSL Alerts (Preserved because funny - 226787)
+             *   ArtStation
+             *   AMC
+             *   AirBnB
+             *   PayPal
+             *   Coinbase
+             *   eBay
+             *   Microsoft
+             */
+            if (number.length() == 6 && !number.equals("226787")) return true;
+
+            /* Seven-Digit Numbers
+             *   AT&T
+             *   That one time I got added to a group chat with randos and everyone was confused.
+             */
+            if (number.length() == 7) return true;
+
+            /* Eight-Digit Numbers (Automated Messages)
+             *   AT&T
+             */
+            if (number.length() == 8) return true;
+
+            // Nine-Digit Numbers (Invalid Numbers)
+            if (number.length() == 9) return true;
+
+            // Specific Messages
+            if(
+                    number.equals("90g@smile.ms") ||                      // Webster Dental Care
+                    number.equals("zachariahstantonzle6347@gmail.com") || // Spam
+                    number.equals("barbrawhartwellgr0155@hotmail.com") || // Spam
+                    number.equals("hishighness1947@gmail.com") ||         // Spam
+                    number.equals("+8622759730") ||                       // Spam
+                    number.contains("mms.cricketwireless.net")            // Spam
+            ) return true;
+        }
+
+        return false;
+    }
+
+    /*--- Private Methods ---*/
+
+    private static boolean shouldPhoneNumberBeSkipped(String number) {
+
+        /* This text appears as an additional address alongside correct
+         * phone numbers in exactly 13 early MMS entries. No idea why.
+         */
+        if (number.equals("insert-address-token")) return true;
+
+        return false;
     }
 }
