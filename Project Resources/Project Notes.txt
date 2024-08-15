@@ -80,6 +80,8 @@ A tool that removes duplicate and spam messages from SMS Backup & Restore archiv
     -----
     New Archive:	77118 Messages (69% of Original Archive - Nice)
     -----
+    Final Archive:  76154 Messages (After Manual Spam Cleanup)
+    -----
 
   Last Duplicate Message:
 
