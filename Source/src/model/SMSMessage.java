@@ -50,14 +50,30 @@ public class SMSMessage {
 
         if (o == null) return false;
 
-        if (o.getClass() != MMSMessage.class) return false;
+        boolean comparingToSMSMessage = false;
+        boolean comparingToMMSMessage = false;
+        if (SMSMessage.class == o.getClass()) comparingToSMSMessage = true;
+        if (MMSMessage.class == o.getClass()) comparingToMMSMessage = true;
 
-        MMSMessage mmsMessage = (MMSMessage) o;
+        if (!(comparingToMMSMessage || comparingToSMSMessage)) return false;
 
-        return mmsMessage.getPhoneNumberListSize() == 1 &&
-                mmsMessage.doesPhoneNumberListContain(phoneNumber) &&
-                mmsMessage.getTimestampWithoutMilliseconds().equals(getTimestampWithoutMilliseconds()) &&
-                mmsMessage.getContent().equals(content);
+        if (comparingToSMSMessage) {
+
+            // Compare this (SMS) to SMS
+            SMSMessage smsMessage = (SMSMessage) o;
+            return getPhoneNumber().equals(smsMessage.getPhoneNumber()) &&
+                    getTimestampWithoutMilliseconds().equals(smsMessage.getTimestampWithoutMilliseconds()) &&
+                    content.equals(smsMessage.getContent());
+
+        } else {
+
+            // Compare this (SMS) to MMS
+            MMSMessage mmsMessage = (MMSMessage) o;
+            return mmsMessage.getPhoneNumberListSize() == 1 &&
+                    mmsMessage.doesPhoneNumberListContain(phoneNumber) &&
+                    mmsMessage.getTimestampWithoutMilliseconds().equals(getTimestampWithoutMilliseconds()) &&
+                    mmsMessage.getContent().equals(content);
+        }
     }
 
     public static SMSMessage fromEntry(String entry) {

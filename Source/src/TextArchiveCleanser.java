@@ -39,7 +39,9 @@ public class TextArchiveCleanser {
     List<SMSMessage> preservedSMSMessages;
     List<SMSMessage> filteredSMSMessages;
     List<MMSMessage> preservedMMSMessages;
-    int filteredMMSMessages = 0;
+    List<MMSMessage> filteredMMSMessages;
+
+    int duplicateSMSMessages = 0;
     int duplicateMMSMessages = 0;
 
 
@@ -51,6 +53,7 @@ public class TextArchiveCleanser {
         preservedSMSMessages = new ArrayList<>();
         filteredSMSMessages = new ArrayList<>();
         preservedMMSMessages = new ArrayList<>();
+        filteredMMSMessages = new ArrayList<>();
 
         // Open Files
         openInputFile();
@@ -70,11 +73,12 @@ public class TextArchiveCleanser {
 
         System.out.println("-----");
         System.out.println("SMS Preserved:\t" + preservedSMSMessages.size());
+        System.out.println("SMS Duplicates:\t" + duplicateSMSMessages);
         System.out.println("SMS Filtered:\t" + filteredSMSMessages.size());
         System.out.println("-----");
-        System.out.println("MMS Duplicates:\t" + duplicateMMSMessages);
         System.out.println("MMS Preserved:\t" + preservedMMSMessages.size());
-        System.out.println("MMS Filtered:\t" + filteredMMSMessages);
+        System.out.println("MMS Duplicates:\t" + duplicateMMSMessages);
+        System.out.println("MMS Filtered:\t" + filteredMMSMessages.size());
         System.out.println("-----");
         System.out.println("New Archive:\t" + (preservedSMSMessages.size() + preservedMMSMessages.size()) + " Messages");
     }
@@ -84,21 +88,27 @@ public class TextArchiveCleanser {
 
     private void processSMSEntry(String entry) {
         SMSMessage smsMessage = SMSMessage.fromEntry(entry);
-        if (smsMessage.shouldBeFiltered()) {
-            filteredSMSMessages.add(smsMessage);
+        if (preservedSMSMessages.contains(smsMessage) || filteredSMSMessages.contains(smsMessage)) {
+            duplicateSMSMessages++;
         } else {
-            preservedSMSMessages.add(smsMessage);
-            writeToOutputFile(entry);
+            if (smsMessage.shouldBeFiltered()) {
+                filteredSMSMessages.add(smsMessage);
+            } else {
+                preservedSMSMessages.add(smsMessage);
+                writeToOutputFile(entry);
+            }
         }
     }
 
     private void processMMSEntry(String entry) {
         MMSMessage mmsMessage = MMSMessage.fromEntry(entry);
-        if (preservedSMSMessages.contains(mmsMessage) || filteredSMSMessages.contains(mmsMessage)) {
+        if (preservedSMSMessages.contains(mmsMessage) || filteredSMSMessages.contains(mmsMessage) ||
+                preservedMMSMessages.contains(mmsMessage) || filteredMMSMessages.contains(mmsMessage)
+        ) {
             duplicateMMSMessages++;
         } else {
             if (mmsMessage.shouldBeFiltered()) {
-                filteredMMSMessages++;
+                filteredMMSMessages.add(mmsMessage);
             } else {
                 preservedMMSMessages.add(mmsMessage);
                 writeToOutputFile(entry);
