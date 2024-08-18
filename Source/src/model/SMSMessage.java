@@ -1,7 +1,7 @@
 package model;
 
 
-public class SMSMessage {
+public class SMSMessage extends Message {
 
 
     /*--- Variables ---*/
@@ -16,16 +16,13 @@ public class SMSMessage {
     private static final String CONTENT_END_SINGLE_QUOTE = "' toa=\"";
 
     private final String phoneNumber;
-    private final String timestamp;
-    private final String content;
 
 
     /*--- Constructor ---*/
 
     public SMSMessage(String phoneNumber, String timestamp, String content) {
+        super(timestamp, content);
         this.phoneNumber = phoneNumber;
-        this.timestamp = timestamp;
-        this.content = content;
     }
 
 

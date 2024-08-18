@@ -1,4 +1,5 @@
 import model.MMSMessage;
+import model.Message;
 import model.SMSMessage;
 
 import java.io.*;
@@ -29,20 +30,17 @@ public class TextArchiveCleanser {
     /*--- Variable Declarations ---*/
 
     // Input Processing
-    private BufferedReader inputFileBufferedReader;
+    private BufferedReader inputABufferedReader;
+    private BufferedReader inputBBufferedReader;
     private String inputLine;
 
     // Output Processing
     private BufferedWriter outputBufferedWriter;
 
     // Message Processing
-    List<SMSMessage> preservedSMSMessages;
-    List<SMSMessage> filteredSMSMessages;
-    List<MMSMessage> preservedMMSMessages;
-    List<MMSMessage> filteredMMSMessages;
-
-    int duplicateSMSMessages = 0;
-    int duplicateMMSMessages = 0;
+    List<Message> preservedMessages;
+    List<Message> duplicateMessages;
+    List<Message> filteredMessages;
 
 
     /*--- Constructor ---*/
@@ -50,13 +48,15 @@ public class TextArchiveCleanser {
     public TextArchiveCleanser() {
 
         // Initialize Variables
-        preservedSMSMessages = new ArrayList<>();
-        filteredSMSMessages = new ArrayList<>();
-        preservedMMSMessages = new ArrayList<>();
-        filteredMMSMessages = new ArrayList<>();
+        preservedMessages = new ArrayList<>();
+        duplicateMessages = new ArrayList<>();
+        filteredMessages = new ArrayList<>();
 
-        // Open Files
-        openInputFile();
+        // Open Input Files
+        inputABufferedReader = openInputFile("input/input.xml");
+        inputBBufferedReader = openInputFile("input/input_B.xml");
+
+        // Open Output File
         openOutputFile();
     }
 
@@ -72,15 +72,11 @@ public class TextArchiveCleanser {
         closeOutputFile();
 
         System.out.println("-----");
-        System.out.println("SMS Preserved:\t" + preservedSMSMessages.size());
-        System.out.println("SMS Duplicates:\t" + duplicateSMSMessages);
-        System.out.println("SMS Filtered:\t" + filteredSMSMessages.size());
+        System.out.println("Preserved:\t" + preservedMessages.size());
+        System.out.println("Duplicates:\t" + duplicateMessages.size());
+        System.out.println("Filtered:\t" + filteredMessages.size());
         System.out.println("-----");
-        System.out.println("MMS Preserved:\t" + preservedMMSMessages.size());
-        System.out.println("MMS Duplicates:\t" + duplicateMMSMessages);
-        System.out.println("MMS Filtered:\t" + filteredMMSMessages.size());
-        System.out.println("-----");
-        System.out.println("New Archive:\t" + (preservedSMSMessages.size() + preservedMMSMessages.size()) + " Messages");
+        System.out.println("New Archive:\t" + preservedMessages.size() + " Messages");
     }
 
 
@@ -88,13 +84,13 @@ public class TextArchiveCleanser {
 
     private void processSMSEntry(String entry) {
         SMSMessage smsMessage = SMSMessage.fromEntry(entry);
-        if (preservedSMSMessages.contains(smsMessage) || filteredSMSMessages.contains(smsMessage)) {
-            duplicateSMSMessages++;
+        if (preservedMessages.contains(smsMessage) || filteredMessages.contains(smsMessage)) {
+            duplicateMessages.add(smsMessage);
         } else {
             if (smsMessage.shouldBeFiltered()) {
-                filteredSMSMessages.add(smsMessage);
+                filteredMessages.add(smsMessage);
             } else {
-                preservedSMSMessages.add(smsMessage);
+                preservedMessages.add(smsMessage);
                 writeToOutputFile(entry);
             }
         }
@@ -102,15 +98,13 @@ public class TextArchiveCleanser {
 
     private void processMMSEntry(String entry) {
         MMSMessage mmsMessage = MMSMessage.fromEntry(entry);
-        if (preservedSMSMessages.contains(mmsMessage) || filteredSMSMessages.contains(mmsMessage) ||
-                preservedMMSMessages.contains(mmsMessage) || filteredMMSMessages.contains(mmsMessage)
-        ) {
-            duplicateMMSMessages++;
+        if (preservedMessages.contains(mmsMessage) || filteredMessages.contains(mmsMessage)) {
+            duplicateMessages.add(mmsMessage);
         } else {
             if (mmsMessage.shouldBeFiltered()) {
-                filteredMMSMessages.add(mmsMessage);
+                filteredMessages.add(mmsMessage);
             } else {
-                preservedMMSMessages.add(mmsMessage);
+                preservedMessages.add(mmsMessage);
                 writeToOutputFile(entry);
             }
         }
@@ -127,7 +121,7 @@ public class TextArchiveCleanser {
         while (!isHeaderParsingComplete) {
 
             // Read Next Line
-            if ((inputLine = getNextLineOfInputFile()) == null) {
+            if ((inputLine = getNextLineOfInputFile(inputABufferedReader)) == null) {
                 System.out.println("End of file reached while parsing header.");
                 exit(0);
             }
@@ -168,7 +162,7 @@ public class TextArchiveCleanser {
             }
 
             // Read Next Line
-            if (!isSMSParsingComplete && (inputLine = getNextLineOfInputFile()) == null) {
+            if (!isSMSParsingComplete && (inputLine = getNextLineOfInputFile(inputABufferedReader)) == null) {
                 System.out.println("End of file reached while parsing sms entries.");
                 exit(0);
             }
@@ -197,7 +191,7 @@ public class TextArchiveCleanser {
 
                 // MMS Entry - Add Subsequent Lines To String
                 boolean isEndOfMMSReached = false;
-                while (!isEndOfMMSReached && (inputLine = getNextLineOfInputFile()) != null) {
+                while (!isEndOfMMSReached && (inputLine = getNextLineOfInputFile(inputABufferedReader)) != null) {
                     mmsEntryStringBuilder.append(inputLine);
 
                     matcher = endOfMMSPattern.matcher(inputLine);
@@ -214,7 +208,7 @@ public class TextArchiveCleanser {
 
             // Check Next Line
             if (!isEndOfFileReached) {
-                if ((inputLine = getNextLineOfInputFile()) == null) {
+                if ((inputLine = getNextLineOfInputFile(inputABufferedReader)) == null) {
                     System.out.println("End of file reached while parsing mms entries.");
                     exit(0);
                 }
@@ -231,10 +225,10 @@ public class TextArchiveCleanser {
 
     /*--- Private I/O Methods ---*/
 
-    private void openInputFile() {
+    private BufferedReader openInputFile(String filePath) {
 
         // Build Input File
-        File inputFile = new File("input/input.xml");
+        File inputFile = new File(filePath);
 
         // Ensure Input File Exists
         if (!inputFile.exists()) {
@@ -245,16 +239,18 @@ public class TextArchiveCleanser {
         // Build Input BufferedReader
         try {
             FileReader inputFileReader = new FileReader(inputFile);
-            inputFileBufferedReader = new BufferedReader(inputFileReader);
+            return new BufferedReader(inputFileReader);
         } catch(Exception e) {
             System.out.println("Error building BufferedReader for input file.");
             exit(0);
         }
+
+        return null;
     }
 
-    private String getNextLineOfInputFile() {
+    private String getNextLineOfInputFile(BufferedReader bufferedReader) {
         try {
-            return inputFileBufferedReader.readLine();
+            return bufferedReader.readLine();
         } catch (IOException e) {
             return null;
         }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MMSMessage {
+public class MMSMessage extends Message {
 
 
     /*--- Variables ---*/
@@ -23,16 +23,13 @@ public class MMSMessage {
     private static final String CONTENT_END_SINGLE_QUOTE = "' />";
 
     private final List<String> phoneNumberList;
-    private final String timestamp;
-    private final String content;
 
 
     /*--- Constructor ---*/
 
     public MMSMessage(List<String> phoneNumberList, String timestamp, String content) {
+        super(timestamp, content);
         this.phoneNumberList = phoneNumberList;
-        this.timestamp = timestamp;
-        this.content = content;
     }
 
 
